@@ -75,6 +75,25 @@ class MailSender
   }
 
   /**
+   * Send mail to one recipients with all supported method.
+   * 
+   * @param string       $name        [required]
+   * @param string       $email       [required]
+   * @param string       $subject     [required]
+   * @param string       $body        [required]
+   * @param array|string $attachments [optional]
+   */
+  public function mailTo(string $name, string $email, string $subject, string $body, ?array $attachments = null) : self
+  {
+    $this->mail->addAddress($email, $name);
+    $this->mail->Subject = $subject;
+    $this->Body = $this->formatBody($body);
+    $this->AltBody = \strip_tags($body);
+    $this->attachments = (array)$attachments;
+    return $this;
+  }
+
+  /**
    * Add a file attachment to the email.
    * 
    * @param string      $file [required]
@@ -119,20 +138,19 @@ class MailSender
    */
   public function with(array $options) : self
   {
-    if (!isset($options[0])) return $this->sendTo([$options]);
+    if (!isset($options[0])) return $this->with([$options]);
 
     foreach($options as $option) {
       $name        = $option['name'];
       $email       = $option['email'];
       $subject     = $option['subject'];
       $body        = $option['body'] ?? $option['html'];
-      $altBody     = $option['altBody'] ?? '';
       $attachments = $option['attachments'] ?? $option['attachment'] ?? [];
 
       $this->mail->addAddress($email, $name);
       $this->mail->Subject = $subject;
-      $this->mail->Body    = $body;
-      $this->mail->AltBody = $altBody;
+      $this->mail->Body    = $this->formatBody($body);
+      $this->mail->AltBody = \strip_tags($altBody);
       $this->attachments((array)$attachments);
     }
 
@@ -203,8 +221,10 @@ class MailSender
   }
 
   /**
+   * Parse CSS code and recursively include files imported via @import.
+   * 
    * @param string $code [required]
-   * @return string
+   * @return string Parsed CSS with inlined @import contents.
    */
   private function css($code) : string
   {
@@ -218,10 +238,13 @@ class MailSender
   }
 
   /**
-   * Parse CSS code and recursively include files imported via @import.
+   * Format the HTML body to inline CSS and embed local images.
+   * 
+   * - Converts <link rel="stylesheet" href=""> to inline <style> blocks.
+   * - Converts <img src="path"> and other tag sources to embedded CIDs.
    * 
    * @param string $html [required]
-   * @return string Parsed CSS with inlined @import contents.
+   * @return string Formatted HTML with embedded resources.
    */
   private function formatBody(string $html) : string
   {
