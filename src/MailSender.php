@@ -36,13 +36,14 @@ class MailSender
    */
   public function __construct(?string $name = null, ?string $email = null, ?string $password = null)
   {
-    $name = $name ?? $_ENV['MAILER_NAME'] ?? $_ENV['APP_NAME'];
-    $email = $email ?? $_ENV['MAILER_EMAIL'];
-    $password = $password ?? $_ENV['MAILER_PASSWORD'];
-
     $mail = new PHPMailer;
 
     try {
+      $name = $name ?? $_ENV['MAILER_NAME'] ?? $_ENV['APP_NAME'];
+      $email = $email ?? $_ENV['MAILER_EMAIL'];
+      $password = $password ?? $_ENV['MAILER_PASSWORD'];
+
+      // PHPMailer Configuration
       $mail->isSMTP();
       $mail->Host       = 'smtp.gmail.com';
       $mail->SMTPSecure = 'tls';
