@@ -84,13 +84,13 @@ class MailSender
    * @param string       $body        [required]
    * @param array|string $attachments [optional]
    */
-  public function mailTo(string $name, string $email, string $subject, string $body, ?array $attachments = null) : self
+  public function mailTo(string $name, string $email, string $subject, string $body, $attachments = []) : self
   {
     $this->mail->addAddress($email, $name);
     $this->mail->Subject = $subject;
-    $this->Body = $this->formatBody($body);
-    $this->AltBody = \strip_tags($body);
-    $this->attachments = (array)$attachments;
+    $this->mail->Body = $this->formatBody($body);
+    $this->mail->AltBody = \strip_tags($body);
+    $this->attachments((array)$attachments);
     return $this;
   }
 
