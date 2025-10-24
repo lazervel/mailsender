@@ -83,6 +83,8 @@ class MailSender
    * @param string       $subject     [required]
    * @param string       $body        [required]
    * @param array|string $attachments [optional]
+   * 
+   * @return self
    */
   public function mailTo(string $name, string $email, string $subject, string $body, $attachments = []) : self
   {
